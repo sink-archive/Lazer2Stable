@@ -19,9 +19,6 @@
       <EmbeddedResource Include="Mappings\SkinInfo.hbm.xml" />
       <None Remove="Mappings\Beatmapinfo.hbm.xml" />
       <EmbeddedResource Include="Mappings\BeatmapInfo.hbm.xml" />
-      <None Update="client.db">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
 
 </Project>

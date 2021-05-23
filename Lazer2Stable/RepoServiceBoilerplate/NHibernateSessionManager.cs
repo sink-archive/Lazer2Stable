@@ -21,7 +21,7 @@ namespace Lazer2Stable.RepoServiceBoilerplate
 				var connectionProvider    = "NHibernate.Connection.DriverConnectionProvider";
 				var connectionDriverClass = "NHibernate.Driver.SQLite20Driver";
 				var connectionString      = $"Data Source={dbLocation};Version=3";
-				var showSql               = "true";
+				var showSql               = "false";
 
 				// add mapping files
 				var assembly      = GetType().Assembly;

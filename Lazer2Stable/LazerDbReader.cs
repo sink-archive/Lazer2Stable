@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Lazer2Stable.Domain;
 using Lazer2Stable.RepoServiceBoilerplate;
 using Lazer2Stable.RepoServices;
@@ -18,7 +19,16 @@ namespace Lazer2Stable
 
 		public LazerDbReader()
 		{
-			_sessionManager = new NHibernateSessionManager("client.db");
+			var platform = Environment.OSVersion.Platform;
+			var basePath = platform switch
+			{
+				PlatformID.Win32NT      => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+				PlatformID.Unix         => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".local/share"),
+				PlatformID.MacOSX       => throw new NotImplementedException("MacOS is not supported yet!"),
+				_                       => throw new ArgumentOutOfRangeException()
+			};
+			var dbPath = Path.Join(basePath, "osu/client.db");
+			_sessionManager = new NHibernateSessionManager(dbPath);
 		}
 
 		public BeatmapInfo[]                         Maps     { get; private set; }
