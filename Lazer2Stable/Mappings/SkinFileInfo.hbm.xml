@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="Lazer2Stable"
+                   namespace="Lazer2Stable.Domain">
+    
+    <class name="SkinFileInfo">
+        <id name="ID">
+            <generator class="increment" />
+        </id>
+        <many-to-one name="FileInfo" column="FileInfoID" class="FileInfo" />
+        <property name="Filename" />
+        <many-to-one name="SkinInfo" column="SkinInfoID" class="SkinInfo" />
+    </class>
+    
+</hibernate-mapping>

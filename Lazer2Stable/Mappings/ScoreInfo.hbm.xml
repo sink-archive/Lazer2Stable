@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="Lazer2Stable"
+                   namespace="Lazer2Stable.Domain">
+    
+    <class name="ScoreInfo">
+        <id name="ID">
+            <generator class="increment" />
+        </id>
+        <many-to-one name="BeatmapInfo" column="BeatmapInfoID" class="BeatmapInfo" />
+        <property name="Hash" />
+    </class>
+    
+</hibernate-mapping>

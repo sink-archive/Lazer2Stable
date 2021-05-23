@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
+      <PackageReference Include="NHibernate" Version="5.3.8" />
+      <PackageReference Include="System.Data.SQLite" Version="1.0.113.7" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Mappings\BeatmapSetFileInfo.hbm.xml" />
+      <EmbeddedResource Include="Mappings\FileInfo.hbm.xml" />
+      <EmbeddedResource Include="Mappings\ScoreFileInfo.hbm.xml" />
+      <EmbeddedResource Include="Mappings\ScoreInfo.hbm.xml" />
+      <EmbeddedResource Include="Mappings\SkinFileInfo.hbm.xml" />
+      <EmbeddedResource Include="Mappings\SkinInfo.hbm.xml" />
+      <None Remove="Mappings\Beatmapinfo.hbm.xml" />
+      <EmbeddedResource Include="Mappings\BeatmapInfo.hbm.xml" />
+      <None Update="hibernate.cfg.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>
