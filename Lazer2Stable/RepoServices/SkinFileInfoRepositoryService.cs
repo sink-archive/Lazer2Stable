@@ -18,6 +18,9 @@ namespace Lazer2Stable.RepoServices
 		public SkinFileInfo GetByID(int ID)
 			=> Session.Query<SkinFileInfo>().FirstOrDefault(s => s.ID == ID);
 
+		public SkinFileInfo[] GetBySkinID(int ID)
+			=> Session.Query<SkinFileInfo>().Where(s => s.SkinInfo.ID == ID).ToArray();
+
 		public SkinFileInfo[] GetAll()
 			=> Session.Query<SkinFileInfo>().ToArray();
 	}

@@ -1,9 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using NHibernate;
-using NHibernate.Linq;
 
 namespace Lazer2Stable.RepoServiceBoilerplate
 {
@@ -37,7 +33,7 @@ namespace Lazer2Stable.RepoServiceBoilerplate
 
                 Session = sessionManager.OpenSession();
 
-                Transaction = Session.BeginTransaction();
+                Transaction = Session.GetCurrentTransaction() ?? Session.BeginTransaction();
                 _ownerOfSession = true;
             }
             catch (Exception)

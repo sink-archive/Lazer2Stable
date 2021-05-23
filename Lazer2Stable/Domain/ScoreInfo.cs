@@ -2,8 +2,8 @@ namespace Lazer2Stable.Domain
 {
 	public class ScoreInfo
 	{
-		public int         ID          { get; set; }
-		public BeatmapInfo BeatmapInfo { get; set; }
-		public string      Hash        { get; set; }
+		public virtual int         ID          { get; set; }
+		public virtual BeatmapInfo BeatmapInfo { get; set; }
+		public virtual string      Hash        { get; set; }
 	}
 }

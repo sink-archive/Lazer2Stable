@@ -2,9 +2,9 @@ namespace Lazer2Stable.Domain
 {
 	public class BeatmapInfo
 	{
-		public int    ID               { get; set; }
-		public int    BeatmapSetInfoID { get; set; }
-		public string Hash             { get; set; }
-		public string Path             { get; set; }
+		public virtual int    ID               { get; set; }
+		public virtual int    BeatmapSetInfoID { get; set; }
+		public virtual string Hash             { get; set; }
+		public virtual string Path             { get; set; }
 	}
 }

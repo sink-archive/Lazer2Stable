@@ -4,8 +4,8 @@ namespace Lazer2Stable.Interfaces
 {
 	public interface IBeatmapSetFileInfoRepositoryService
 	{
-		BeatmapSetFileInfo GetByID(int           ID);
-		BeatmapSetFileInfo GetByBeatmapSetID(int ID);
+		BeatmapSetFileInfo   GetByID(int           ID);
+		BeatmapSetFileInfo[] GetByBeatmapSetID(int ID);
 		BeatmapSetFileInfo[] GetAll();
 	}
 }

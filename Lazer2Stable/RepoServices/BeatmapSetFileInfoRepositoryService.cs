@@ -18,8 +18,8 @@ namespace Lazer2Stable.RepoServices
 		public BeatmapSetFileInfo GetByID(int ID)
 			=> Session.Query<BeatmapSetFileInfo>().FirstOrDefault(b => b.ID == ID);
 
-		public BeatmapSetFileInfo GetByBeatmapSetID(int ID)
-			=> Session.Query<BeatmapSetFileInfo>().FirstOrDefault(b => b.BeatmapSetInfoID == ID);
+		public BeatmapSetFileInfo[] GetByBeatmapSetID(int ID)
+			=> Session.Query<BeatmapSetFileInfo>().Where(b => b.BeatmapSetInfoID == ID).ToArray();
 
 		public BeatmapSetFileInfo[] GetAll()
 			=> Session.Query<BeatmapSetFileInfo>().ToArray();

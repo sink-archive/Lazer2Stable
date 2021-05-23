@@ -6,5 +6,6 @@ namespace Lazer2Stable.Interfaces
 	{
 		SkinFileInfo   GetByID(int ID);
 		SkinFileInfo[] GetAll(); // THOUSANDS of objects returned from a single function go BRRRR
+		SkinFileInfo[] GetBySkinID(int ID);
 	}
 }
