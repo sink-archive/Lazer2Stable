@@ -31,9 +31,8 @@ namespace Lazer2Stable.RepoServiceBoilerplate
             try
             {
 
-                Session = sessionManager.OpenSession();
-
-                Transaction = Session.GetCurrentTransaction() ?? Session.BeginTransaction();
+                Session         = sessionManager.OpenSession();
+				Transaction     = Session.GetCurrentTransaction() ?? Session.BeginTransaction();
                 _ownerOfSession = true;
             }
             catch (Exception)

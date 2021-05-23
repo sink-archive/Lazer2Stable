@@ -7,9 +7,9 @@
         <id name="ID">
             <generator class="increment" />
         </id>
-        <many-to-one name="FileInfo" column="FileInfoID" class="FileInfo" />
+        <many-to-one name="FileInfo" column="FileInfoID" class="FileInfo" lazy="false" />
         <property name="Filename" />
-        <many-to-one name="ScoreInfo" column="ScoreInfoID" class="ScoreInfo" />
+        <many-to-one name="ScoreInfo" column="ScoreInfoID" class="ScoreInfo" lazy="false" />
     </class>
     
 </hibernate-mapping>

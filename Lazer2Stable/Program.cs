@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Lazer2Stable.Domain;
 
@@ -25,6 +26,43 @@ namespace Lazer2Stable
 			dbReader.Dispose();
 			
 			PrintCounts(maps, setFiles, scores, replays, skins, skinFiles);
+
+			var exportPath     = GetAndPrepareExportPath();
+			var lazerFilesPath = LazerFolderUtils.GetLazerFiles();
+
+			var exporter = new Exporter(lazerFilesPath, maps, setFiles);
+			exporter.ExportMaps(exportPath);
+		}
+
+		private static string GetAndPrepareExportPath()
+		{
+			reEnterPath:
+			Console.Write("Enter a path to export to: ");
+			var dirPath = Console.ReadLine();
+			if (string.IsNullOrWhiteSpace(dirPath))
+			{
+				Console.WriteLine("Please enter a path.");
+				goto reEnterPath;
+			}
+
+			if (File.Exists(dirPath))
+			{
+				Console.WriteLine("That path is a file. Please enter a different path.");
+				goto reEnterPath; // shut up ik this can be a loop but this is just easier
+			}
+
+			if (Directory.Exists(dirPath))
+			{
+				Console.WriteLine(new DirectoryInfo(dirPath).GetFiles().Length == 0
+									  ? "This directory exists but is empty. Press enter to export to it or ctrl-c to exit."
+									  : "This directory is not empty. Exporting here is a really bad idea but if you want to hit enter, else ctrl-c to exit.");
+
+				Console.ReadLine();
+			}
+
+			Directory.CreateDirectory(dirPath);
+
+			return dirPath;
 		}
 
 		private static void PrintCounts(BeatmapInfo[] maps, Dictionary<int, BeatmapSetFileInfo[]> setFiles,
@@ -42,8 +80,8 @@ namespace Lazer2Stable
 			var skinCount   = skins.Length;
 			var skinFileCount = skinFiles.Select(pair => pair.Value.Length)
 										 .Aggregate(0, (current, next) => current + next);
-			
-			Console.WriteLine("Found:\n"                                                                      + 
+
+			Console.WriteLine("Found:\n"                                                                       +
 							  $" - {mapCount} beatmaps in {setCount} beatmapsets, with {setFileCount} files\n" +
 							  $" - {scoreCount} scores and {replayCount} replays\n"                            +
 							  $" - {skinCount} skins with {skinFileCount} files");

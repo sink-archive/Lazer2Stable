@@ -8,7 +8,7 @@
             <generator class="increment" />
         </id>
         <property name="BeatmapSetInfoID" />
-        <many-to-one name="FileInfo" column="FileInfoID" class="FileInfo" />
+        <many-to-one name="FileInfo" column="FileInfoID" class="FileInfo" lazy="false" />
         <property name="Filename" />
     </class>
     
