@@ -25,13 +25,20 @@ namespace Lazer2Stable
 				);
 			dbReader.Dispose();
 			
-			PrintCounts(maps, setFiles, scores, replays, skins, skinFiles);
+			PrintCounts(maps, setFiles, scores, replays, skins, skinFiles, out var setCount);
 
 			var exportPath     = GetAndPrepareExportPath();
 			var lazerFilesPath = LazerFolderUtils.GetLazerFiles();
 
-			var exporter = new Exporter(lazerFilesPath, maps, setFiles);
-			exporter.ExportMaps(exportPath);
+			var exporter = new Exporter(lazerFilesPath, maps, setFiles, skins, skinFiles);
+
+			Console.Write($"Exporting {setCount} beatmap sets - this WILL take a while... ");
+			exporter.ExportMaps(Path.Combine(exportPath, "Songs"));
+			
+			Console.Write($"Done!\nExporting {skins.Length} skins - this WILL take a while... ");
+			exporter.ExportSkins(Path.Combine(exportPath, "Skins"));
+			
+			Console.WriteLine("Done!");
 		}
 
 		private static string GetAndPrepareExportPath()
@@ -67,10 +74,10 @@ namespace Lazer2Stable
 
 		private static void PrintCounts(BeatmapInfo[] maps, Dictionary<int, BeatmapSetFileInfo[]> setFiles,
 										ScoreInfo[] scores, ScoreFileInfo[] replays, SkinInfo[] skins,
-										Dictionary<int, SkinFileInfo[]> skinFiles)
+										Dictionary<int, SkinFileInfo[]> skinFiles, out int setCount)
 		{
 			var mapCount = maps.Length;
-			var setCount = maps.Select(m => m.BeatmapSetInfoID)
+			setCount = maps.Select(m => m.BeatmapSetInfoID)
 							   .Distinct()
 							   .Count();
 			var setFileCount = setFiles.Select(pair => pair.Value.Length)
