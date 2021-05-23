@@ -30,13 +30,16 @@ namespace Lazer2Stable
 			var exportPath     = GetAndPrepareExportPath();
 			var lazerFilesPath = LazerFolderUtils.GetLazerFiles();
 
-			var exporter = new Exporter(lazerFilesPath, maps, setFiles, skins, skinFiles);
+			var exporter = new Exporter(lazerFilesPath, maps, setFiles, skins, skinFiles, replays);
 
 			Console.Write($"Exporting {setCount} beatmap sets - this WILL take a while... ");
 			exporter.ExportMaps(Path.Combine(exportPath, "Songs"));
 			
 			Console.Write($"Done!\nExporting {skins.Length} skins - this WILL take a while... ");
 			exporter.ExportSkins(Path.Combine(exportPath, "Skins"));
+			
+			Console.Write($"Done!\nExporting {replays.Length} replays... ");
+			exporter.ExportReplays(Path.Combine(exportPath, "Replays"));
 			
 			Console.WriteLine("Done!");
 		}
@@ -60,7 +63,7 @@ namespace Lazer2Stable
 
 			if (Directory.Exists(dirPath))
 			{
-				Console.WriteLine(new DirectoryInfo(dirPath).GetFiles().Length == 0
+				Console.WriteLine(!new DirectoryInfo(dirPath).EnumerateFileSystemInfos().Any()
 									  ? "This directory exists but is empty. Press enter to export to it or ctrl-c to exit."
 									  : "This directory is not empty. Exporting here is a really bad idea but if you want to hit enter, else ctrl-c to exit.");
 
