@@ -3,12 +3,12 @@
                    assembly="Lazer2Stable"
                    namespace="Lazer2Stable.Domain">
     
-    <class name="ScoreInfo">
+    <class name="BeatmapMetadata">
         <id name="ID">
             <generator class="increment" />
         </id>
-        <many-to-one name="BeatmapInfo" column="BeatmapInfoID" class="BeatmapInfo" />
-        <property name="Hash" />
+        <property name="Artist" />
+        <property name="Title" />
     </class>
     
 </hibernate-mapping>

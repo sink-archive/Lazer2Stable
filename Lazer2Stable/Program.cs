@@ -10,11 +10,12 @@ namespace Lazer2Stable
 	{
 		private static void Main(/*string[] args*/)
 		{
-			Console.Write("Connecting to osu!lazer database (client.db)... ");
+			PrintProgressInfo("Connecting to osu!lazer database (client.db)... ");
 			var dbReader = new LazerDbReader();
-			Console.Write("Done!\nReading data from database... ");
+			PrintSuccess();
+			PrintProgressInfo("Reading data from database... ");
 			dbReader.ReadAll();
-			Console.WriteLine("Done!");
+			PrintSuccess();
 			var (maps, scores, skins) = (
 				dbReader.Mapsets,
 				dbReader.Scores,
@@ -29,16 +30,34 @@ namespace Lazer2Stable
 
 			var exporter = new Exporter(lazerFilesPath, maps, skins, scores);
 
-			Console.Write($"Exporting {setCount} beatmap sets - this WILL take a while... ");
+			PrintProgressInfo($"Exporting {setCount} beatmap sets - this WILL take a while... ");
 			exporter.ExportMaps(Path.Combine(exportPath, "Songs"));
 			
-			Console.Write($"Done!\nExporting {skins.Count} skins - this WILL take a while... ");
+			PrintSuccess();
+			PrintProgressInfo($"Exporting {skins.Count} skins - this WILL take a while... ");
 			exporter.ExportSkins(Path.Combine(exportPath, "Skins"));
 			
-			Console.Write($"Done!\nExporting {scores.Length} score replays... ");
+			PrintSuccess();
+			PrintProgressInfo($"Exporting {scores.Length} score replays... ");
 			exporter.ExportReplays(Path.Combine(exportPath, "Replays"));
 			
-			Console.WriteLine("Done!");
+			PrintSuccess();
+		}
+
+		private static void PrintProgressInfo(string info)
+		{
+			var col = Console.ForegroundColor;
+			Console.ForegroundColor = ConsoleColor.Blue;
+			Console.Write(info);
+			Console.ForegroundColor = col;
+		}
+
+		private static void PrintSuccess(string success = "Done!")
+		{
+			var col = Console.ForegroundColor;
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine(success);
+			Console.ForegroundColor = col;
 		}
 
 		private static string GetAndPrepareExportPath()
