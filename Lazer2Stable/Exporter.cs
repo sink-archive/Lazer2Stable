@@ -34,6 +34,7 @@ namespace Lazer2Stable
 
 		public void ExportMaps(string outputPath)
 		{
+			Spinner.RunSpinner();
 			foreach (var (set, files) in Maps)
 			{
 				var folderName = $"{set.OnlineBeatmapSetID} {set.Metadata.Artist} - {set.Metadata.Title}";
@@ -41,10 +42,12 @@ namespace Lazer2Stable
 				
 				foreach (var file in files) CopyFile(outputPath, file, folderName, file.FileInfo.ID);
 			}
+			Spinner.StopAllSpinners();
 		}
 
 		public void ExportSkins(string outputPath)
 		{
+			Spinner.RunSpinner();
 			foreach (var (skin, files) in Skins)
 			{
 				var folderName = skin.Name;
@@ -52,16 +55,19 @@ namespace Lazer2Stable
 
 				foreach (var file in files) CopyFile(outputPath, file, folderName, file.FileInfo.ID);
 			}
+			Spinner.StopAllSpinners();
 		}
 		
 		public void ExportReplays(string outputPath)
 		{
+			Spinner.RunSpinner();
 			foreach (var replay in Replays)
 			{
 				Directory.CreateDirectory(outputPath);
 
 				CopyFile(outputPath, replay, string.Empty, replay.ID);
 			}
+			Spinner.StopAllSpinners();
 		}
 
 		private void CopyFile(string outputPath, object file, string folderName, int id)

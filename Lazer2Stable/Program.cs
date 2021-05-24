@@ -8,7 +8,7 @@ namespace Lazer2Stable
 {
 	internal static class Program
 	{
-		private static void Main(/*string[] args*/)
+		private static void Main()
 		{
 			PrintProgressInfo("Connecting to osu!lazer database (client.db)... ");
 			var dbReader = new LazerDbReader();
@@ -30,6 +30,8 @@ namespace Lazer2Stable
 
 			var exporter = new Exporter(lazerFilesPath, maps, skins, scores);
 
+			Console.CursorVisible = false; // makes spinner look nicer
+			
 			PrintProgressInfo($"Exporting {setCount} beatmap sets - this WILL take a while... ");
 			exporter.ExportMaps(Path.Combine(exportPath, "Songs"));
 			
@@ -42,6 +44,8 @@ namespace Lazer2Stable
 			exporter.ExportReplays(Path.Combine(exportPath, "Replays"));
 			
 			PrintSuccess();
+
+			Console.CursorVisible = true; // dont make peoples terminals hard to use
 		}
 
 		private static void PrintProgressInfo(string info)
