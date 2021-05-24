@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using Lazer2Stable.Domain;
@@ -14,6 +15,8 @@ namespace Lazer2Stable
 		public          Dictionary<SkinInfo, SkinFileInfo[]>             Skins;
 		public          ScoreFileInfo[]                                  Replays;
 
+		private readonly ImmutableDictionary<string, FileInfo> _sourceFiles;
+
 		public Exporter(string     lazerFilesPath, Dictionary<BeatmapSetInfo, BeatmapSetFileInfo[]> maps,
 						Dictionary<SkinInfo, SkinFileInfo[]> skins, ScoreFileInfo[] replays)
 		{
@@ -21,6 +24,12 @@ namespace Lazer2Stable
 			Maps           = maps;
 			Skins          = skins;
 			Replays   = replays;
+
+			_sourceFiles = new DirectoryInfo(lazerFilesPath)           // lazer files dir
+						  .GetDirectories()                            // all dirs (a, b, c, etc)
+						  .SelectMany(d => d.GetDirectories())         // get subdirs (a/aa, a/ab, a/ac, etc)
+						  .SelectMany(d => d.GetFiles())               // get files (a/aa/*, etc)
+						  .ToImmutableDictionary(f => f.Name, f => f); // enumerate to dictionary for performance later
 		}
 
 		public void ExportMaps(string outputPath)
@@ -64,8 +73,8 @@ namespace Lazer2Stable
 				ScoreFileInfo r       => r.FileInfo.Hash,
 				_                     => throw new ArgumentOutOfRangeException(nameof(file), file, null)
 			};
-			var sourceFolder = Path.Combine(LazerFilesPath, $"{hash[0]}/{hash[Range.EndAt(2)]}");
-			var sourceFile   = new DirectoryInfo(sourceFolder).GetFiles().FirstOrDefault(f => f.Name.StartsWith(hash));
+			Path.Combine(LazerFilesPath, $"{hash[0]}/{hash[Range.EndAt(2)]}");
+			var sourceFile   = _sourceFiles.ContainsKey(hash) ? _sourceFiles[hash] : null;
 			var sourcePath   = sourceFile?.FullName;
 			if (sourcePath == null) throw new Exception($"Failed to find file with hash {hash} on disk.");
 
