@@ -3,13 +3,12 @@
                    assembly="Lazer2Stable"
                    namespace="Lazer2Stable.Domain">
     
-    <class name="BeatmapSetFileInfo">
+    <class name="BeatmapSetInfo">
         <id name="ID">
             <generator class="increment" />
         </id>
-        <many-to-one name="BeatmapSetInfo" column="BeatmapSetInfoID" class="BeatmapSetInfo" lazy="false" />
-        <many-to-one name="FileInfo" column="FileInfoID" class="FileInfo" lazy="false" />
-        <property name="Filename" />
+        <property name="OnlineBeatmapSetID" />
+        <many-to-one name="Metadata" column="MetadataID" class="BeatmapMetadata" lazy="false" />
     </class>
     
 </hibernate-mapping>

@@ -9,48 +9,39 @@ namespace Lazer2Stable
 {
 	public class Exporter
 	{
-		public readonly string                                LazerFilesPath;
-		public          BeatmapInfo[]                         Maps;
-		public          Dictionary<int, BeatmapSetFileInfo[]> SetFiles;
-		public          SkinInfo[]                            Skins;
-		public          Dictionary<int, SkinFileInfo[]>       SkinFiles;
-		public          ScoreFileInfo[]                       Replays;
+		public readonly string                                           LazerFilesPath;
+		public          Dictionary<BeatmapSetInfo, BeatmapSetFileInfo[]> Maps;
+		public          Dictionary<SkinInfo, SkinFileInfo[]>             Skins;
+		public          ScoreFileInfo[]                                  Replays;
 
-		public Exporter(string     lazerFilesPath, BeatmapInfo[]                   maps,      Dictionary<int, BeatmapSetFileInfo[]> setFiles,
-						SkinInfo[] skins,          Dictionary<int, SkinFileInfo[]> skinFiles, ScoreFileInfo[] replays)
+		public Exporter(string     lazerFilesPath, Dictionary<BeatmapSetInfo, BeatmapSetFileInfo[]> maps,
+						Dictionary<SkinInfo, SkinFileInfo[]> skins, ScoreFileInfo[] replays)
 		{
 			LazerFilesPath = lazerFilesPath;
 			Maps           = maps;
-			SetFiles       = setFiles;
 			Skins          = skins;
-			SkinFiles      = skinFiles;
 			Replays   = replays;
 		}
 
 		public void ExportMaps(string outputPath)
 		{
-			var seenSets = new HashSet<int>();
-			foreach (var map in Maps)
+			foreach (var (set, files) in Maps)
 			{
-				if (seenSets.Contains(map.BeatmapSetInfoID))
-					continue;
-				seenSets.Add(map.BeatmapSetInfoID);
-				
-				var folderName = map.BeatmapSetInfoID.ToString(); // TODO: setup the metadata and construct an authentic path name here
+				var folderName = $"{set.OnlineBeatmapSetID} {set.Metadata.Artist} - {set.Metadata.Title}";
 				Directory.CreateDirectory(Path.Combine(outputPath, folderName));
 				
-				foreach (var file in SetFiles[map.BeatmapSetInfoID]) CopyFile(outputPath, file, folderName, file.FileInfo.ID);
+				foreach (var file in files) CopyFile(outputPath, file, folderName, file.FileInfo.ID);
 			}
 		}
 
 		public void ExportSkins(string outputPath)
 		{
-			foreach (var skin in Skins)
+			foreach (var (skin, files) in Skins)
 			{
 				var folderName = skin.Name;
 				Directory.CreateDirectory(Path.Combine(outputPath, folderName));
 
-				foreach (var file in SkinFiles[skin.ID]) CopyFile(outputPath, file, folderName, file.FileInfo.ID);
+				foreach (var file in files) CopyFile(outputPath, file, folderName, file.FileInfo.ID);
 			}
 		}
 		
@@ -70,14 +61,17 @@ namespace Lazer2Stable
 			{
 				SkinFileInfo sf       => sf.FileInfo.Hash,
 				BeatmapSetFileInfo bf => bf.FileInfo.Hash,
-				ScoreFileInfo r       => r.FileInfo.Hash
+				ScoreFileInfo r       => r.FileInfo.Hash,
+				_                     => throw new ArgumentOutOfRangeException(nameof(file), file, null)
 			};
 			var sourceFolder = Path.Combine(LazerFilesPath, $"{hash[0]}/{hash[Range.EndAt(2)]}");
 			var sourceFile   = new DirectoryInfo(sourceFolder).GetFiles().FirstOrDefault(f => f.Name.StartsWith(hash));
 			var sourcePath   = sourceFile?.FullName;
 			if (sourcePath == null) throw new Exception($"Failed to find file with hash {hash} on disk.");
 
+#pragma warning disable 8509
 			var fileName = file switch
+#pragma warning restore 8509
 			{
 				SkinFileInfo sf       => sf.Filename,
 				BeatmapSetFileInfo bf => bf.Filename,

@@ -8,37 +8,34 @@ namespace Lazer2Stable
 {
 	internal static class Program
 	{
-		private static void Main(string[] args)
+		private static void Main(/*string[] args*/)
 		{
 			Console.Write("Connecting to osu!lazer database (client.db)... ");
 			var dbReader = new LazerDbReader();
 			Console.Write("Done!\nReading data from database... ");
 			dbReader.ReadAll();
 			Console.WriteLine("Done!");
-			var (maps, setFiles, scores, replays, skins, skinFiles) = (
-				dbReader.Maps,
-				dbReader.SetFiles,
+			var (maps, scores, skins) = (
+				dbReader.Mapsets,
 				dbReader.Scores,
-				dbReader.Replays,
-				dbReader.Skins,
-				dbReader.SkinFiles
+				dbReader.Skins
 				);
 			dbReader.Dispose();
 			
-			PrintCounts(maps, setFiles, scores, replays, skins, skinFiles, out var setCount);
+			PrintCounts(maps, scores, skins, out var setCount);
 
 			var exportPath     = GetAndPrepareExportPath();
 			var lazerFilesPath = LazerFolderUtils.GetLazerFiles();
 
-			var exporter = new Exporter(lazerFilesPath, maps, setFiles, skins, skinFiles, replays);
+			var exporter = new Exporter(lazerFilesPath, maps, skins, scores);
 
 			Console.Write($"Exporting {setCount} beatmap sets - this WILL take a while... ");
 			exporter.ExportMaps(Path.Combine(exportPath, "Songs"));
 			
-			Console.Write($"Done!\nExporting {skins.Length} skins - this WILL take a while... ");
+			Console.Write($"Done!\nExporting {skins.Count} skins - this WILL take a while... ");
 			exporter.ExportSkins(Path.Combine(exportPath, "Skins"));
 			
-			Console.Write($"Done!\nExporting {replays.Length} replays... ");
+			Console.Write($"Done!\nExporting {scores.Length} score replays... ");
 			exporter.ExportReplays(Path.Combine(exportPath, "Replays"));
 			
 			Console.WriteLine("Done!");
@@ -75,26 +72,23 @@ namespace Lazer2Stable
 			return dirPath;
 		}
 
-		private static void PrintCounts(BeatmapInfo[] maps, Dictionary<int, BeatmapSetFileInfo[]> setFiles,
-										ScoreInfo[] scores, ScoreFileInfo[] replays, SkinInfo[] skins,
-										Dictionary<int, SkinFileInfo[]> skinFiles, out int setCount)
+		private static void PrintCounts(Dictionary<BeatmapSetInfo, BeatmapSetFileInfo[]> maps,
+										ScoreFileInfo[] scores,
+										Dictionary<SkinInfo, SkinFileInfo[]> skins,
+										out int setCount)
 		{
-			var mapCount = maps.Length;
-			setCount = maps.Select(m => m.BeatmapSetInfoID)
-							   .Distinct()
-							   .Count();
-			var setFileCount = setFiles.Select(pair => pair.Value.Length)
+			setCount = maps.Keys.Count;
+			var setFileCount = maps.Select(pair => pair.Value.Length)
 									   .Aggregate(0, (current, next) => current + next);
 			var scoreCount  = scores.Length;
-			var replayCount = replays.Length;
-			var skinCount   = skins.Length;
-			var skinFileCount = skinFiles.Select(pair => pair.Value.Length)
+			var skinCount   = skins.Count;
+			var skinFileCount = skins.Select(pair => pair.Value.Length)
 										 .Aggregate(0, (current, next) => current + next);
 
-			Console.WriteLine("Found:\n"                                                                       +
-							  $" - {mapCount} beatmaps in {setCount} beatmapsets, with {setFileCount} files\n" +
-							  $" - {scoreCount} scores and {replayCount} replays\n"                            +
-							  $" - {skinCount} skins with {skinFileCount} files");
+			Console.WriteLine($@"Found:
+ - {setCount} beatmapsets, with {setFileCount} files
+ - {scoreCount} scores with exportable replays
+ - {skinCount} skins with {skinFileCount} files");
 		}
 	}
 }

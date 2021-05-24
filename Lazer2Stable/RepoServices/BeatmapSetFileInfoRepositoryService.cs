@@ -1,27 +1,20 @@
+using System.Collections.Generic;
 using System.Linq;
 using Lazer2Stable.Domain;
-using Lazer2Stable.Interfaces;
 using Lazer2Stable.RepoServiceBoilerplate;
 
 namespace Lazer2Stable.RepoServices
 {
-	public class BeatmapSetFileInfoRepositoryService : RepositoryServicesBase, IBeatmapSetFileInfoRepositoryService
+	public class BeatmapSetFileInfoRepositoryService : RepositoryServicesBase
 	{
 		public BeatmapSetFileInfoRepositoryService(INHibernateSessionManager sessionManager) : base(sessionManager)
 		{
 		}
 
-		public BeatmapSetFileInfoRepositoryService(IRepositoryServices repositoryService) : base(repositoryService)
-		{
-		}
-
-		public BeatmapSetFileInfo GetByID(int ID)
-			=> Session.Query<BeatmapSetFileInfo>().FirstOrDefault(b => b.ID == ID);
-
-		public BeatmapSetFileInfo[] GetByBeatmapSetID(int ID)
-			=> Session.Query<BeatmapSetFileInfo>().Where(b => b.BeatmapSetInfoID == ID).ToArray();
-
-		public BeatmapSetFileInfo[] GetAll()
-			=> Session.Query<BeatmapSetFileInfo>().ToArray();
+		public Dictionary<BeatmapSetInfo, BeatmapSetFileInfo[]> GetGroupedBySet()
+			=> Session.Query<BeatmapSetFileInfo>()
+					  .GroupBy(sf => sf.BeatmapSetInfo,
+							   (set, files) => new KeyValuePair<BeatmapSetInfo, BeatmapSetFileInfo[]>(set, files.ToArray()))
+					  .ToDictionary(pair => pair.Key, pair => pair.Value);
 	}
 }
