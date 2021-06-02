@@ -3,27 +3,28 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using Lazer2Stable.Domain;
+using Lazer2Stable.Classes;
+using File = System.IO.File;
 using FileInfo = System.IO.FileInfo;
 
 namespace Lazer2Stable
 {
 	public class Exporter
 	{
-		public readonly string                                           LazerFilesPath;
-		public          Dictionary<BeatmapSetInfo, BeatmapSetFileInfo[]> Maps;
-		public          Dictionary<SkinInfo, SkinFileInfo[]>             Skins;
-		public          ScoreFileInfo[]                                  Replays;
+		public readonly string                           LazerFilesPath;
+		public          Dictionary<Mapset, MapsetFile[]> Maps;
+		public          Dictionary<Skin, SkinFile[]>     Skins;
+		public          ScoreFile[]                      Replays;
 
 		private readonly ImmutableDictionary<string, FileInfo> _sourceFiles;
 
-		public Exporter(string     lazerFilesPath, Dictionary<BeatmapSetInfo, BeatmapSetFileInfo[]> maps,
-						Dictionary<SkinInfo, SkinFileInfo[]> skins, ScoreFileInfo[] replays)
+		public Exporter(string                       lazerFilesPath, Dictionary<Mapset, MapsetFile[]> maps,
+						Dictionary<Skin, SkinFile[]> skins,          ScoreFile[]                  replays)
 		{
 			LazerFilesPath = lazerFilesPath;
 			Maps           = maps;
 			Skins          = skins;
-			Replays   = replays;
+			Replays        = replays;
 
 			_sourceFiles = new DirectoryInfo(lazerFilesPath)           // lazer files dir
 						  .GetDirectories()                            // all dirs (a, b, c, etc)
@@ -37,10 +38,10 @@ namespace Lazer2Stable
 			Spinner.RunSpinner();
 			foreach (var (set, files) in Maps)
 			{
-				var folderName = $"{set.OnlineBeatmapSetID} {set.Metadata.Artist} - {set.Metadata.Title}";
+				var folderName = $"{set.OnlineSetId} {set.Metadata.Artist} - {set.Metadata.Title}";
 				Directory.CreateDirectory(Path.Combine(outputPath, folderName));
 				
-				foreach (var file in files) CopyFile(outputPath, file, folderName, file.FileInfo.ID);
+				foreach (var file in files) CopyFile(outputPath, file, folderName, file.File.Id);
 			}
 			Spinner.StopAllSpinners();
 		}
@@ -53,7 +54,7 @@ namespace Lazer2Stable
 				var folderName = skin.Name;
 				Directory.CreateDirectory(Path.Combine(outputPath, folderName));
 
-				foreach (var file in files) CopyFile(outputPath, file, folderName, file.FileInfo.ID);
+				foreach (var file in files) CopyFile(outputPath, file, folderName, file.File.Id);
 			}
 			Spinner.StopAllSpinners();
 		}
@@ -65,7 +66,7 @@ namespace Lazer2Stable
 			{
 				Directory.CreateDirectory(outputPath);
 
-				CopyFile(outputPath, replay, string.Empty, replay.ID);
+				CopyFile(outputPath, replay, string.Empty, replay.Id);
 			}
 			Spinner.StopAllSpinners();
 		}
@@ -74,10 +75,10 @@ namespace Lazer2Stable
 		{
 			var hash = file switch
 			{
-				SkinFileInfo sf       => sf.FileInfo.Hash,
-				BeatmapSetFileInfo bf => bf.FileInfo.Hash,
-				ScoreFileInfo r       => r.FileInfo.Hash,
-				_                     => throw new ArgumentOutOfRangeException(nameof(file), file, null)
+				SkinFile sf   => sf.File.Hash,
+				MapsetFile mf => mf.File.Hash,
+				ScoreFile r   => r.File.Hash,
+				_             => throw new ArgumentOutOfRangeException(nameof(file), file, null)
 			};
 			Path.Combine(LazerFilesPath, $"{hash[0]}/{hash[Range.EndAt(2)]}");
 			var sourceFile   = _sourceFiles.ContainsKey(hash) ? _sourceFiles[hash] : null;
@@ -88,19 +89,19 @@ namespace Lazer2Stable
 			var fileName = file switch
 #pragma warning restore 8509
 			{
-				SkinFileInfo sf       => sf.Filename,
-				BeatmapSetFileInfo bf => bf.Filename,
-				ScoreFileInfo r       => r.Filename
+				SkinFile sf   => sf.Filename,
+				MapsetFile bf => bf.Filename,
+				ScoreFile r   => r.Filename
 			};
 			var destPath = Path.Combine(outputPath, folderName, /*file.Filename*/ fileName);
 			// create directory to stop folders in skins causing epic fails
 			Directory.CreateDirectory(new FileInfo(destPath).DirectoryName ?? string.Empty);
-			// fix for issue with replays - multiple called "replay.osr" which causes issues.
-			CheckAndFixConflicts(ref destPath, id);
+            // fix for issue with replays - multiple called "replay.osr" which causes issues.
+            CheckAndFixConflicts(ref destPath, id);
 			File.Copy(sourcePath, destPath);
 		}
 
-		private void CheckAndFixConflicts(ref string destPath, int id)
+		private static void CheckAndFixConflicts(ref string destPath, int id)
 		{
 			if (File.Exists(destPath))
 				destPath += $"_{id}";

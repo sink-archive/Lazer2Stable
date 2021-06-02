@@ -1,4 +1,4 @@
-namespace Lazer2Stable.Domain
+namespace Lazer2Stable.DbClasses
 {
 	public class FileInfo
 	{

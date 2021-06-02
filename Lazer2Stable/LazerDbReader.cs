@@ -1,51 +1,24 @@
-using System;
 using System.Collections.Generic;
-using Lazer2Stable.Domain;
-using Lazer2Stable.RepoServiceBoilerplate;
-using Lazer2Stable.RepoServices;
+using Lazer2Stable.Classes;
 
 namespace Lazer2Stable
 {
-	public class LazerDbReader : IDisposable
+	public class LazerDbReader
 	{
-		private readonly NHibernateSessionManager            _sessionManager;
-		private          BeatmapSetFileInfoRepositoryService _beatmapSetFileRepo;
-		private          ScoreFileInfoRepositoryService      _scoreRepo;
-		private          SkinFileInfoRepositoryService       _skinFileRepo;
+		private RepoService _repo;
 
-		public LazerDbReader() => _sessionManager = new NHibernateSessionManager(LazerFolderUtils.GetLazerDatabase());
+		public LazerDbReader() => _repo = new(LazerFolderUtils.GetLazerDatabase());
 
-		public Dictionary<BeatmapSetInfo, BeatmapSetFileInfo[]> Mapsets { get; private set; } = new();
+		public Dictionary<Mapset, MapsetFile[]> Mapsets { get; private set; } = new();
 
-		public void ReadAllMaps()
-		{
-			_beatmapSetFileRepo = new(_sessionManager);
+		public void ReadAllMaps() => Mapsets = _repo.BeatmapsGroupedBySet();
 
-			Mapsets = _beatmapSetFileRepo.GetGroupedBySet();
-			
-			_beatmapSetFileRepo.Dispose();
-		}
+		public ScoreFile[] Scores          { get; private set; }
+		public void            ReadAllScores() => Scores = _repo.AllScores();
 
-		public ScoreFileInfo[] Scores { get; private set; }
-		public void ReadAllScores()
-		{
-			_scoreRepo = new(_sessionManager);
-			
-			Scores = _scoreRepo.GetAll();
-			
-			_scoreRepo.Dispose();
-		}
+		public Dictionary<Skin, SkinFile[]> Skins { get; private set; } = new();
 
-		public Dictionary<SkinInfo, SkinFileInfo[]> Skins { get; private set; } = new();
-
-		public void ReadAllSkins()
-		{
-			_skinFileRepo = new(_sessionManager);
-
-			Skins = _skinFileRepo.GetGroupedBySkin();
-			
-			_skinFileRepo.Dispose();
-		}
+		public void ReadAllSkins() => Skins = _repo.SkinFilesGroupedBySkin();
 
 		public void ReadAll()
 		{
@@ -53,7 +26,5 @@ namespace Lazer2Stable
 			ReadAllScores();
 			ReadAllSkins();
 		}
-
-		public void Dispose() => _sessionManager?.Dispose();
 	}
 }

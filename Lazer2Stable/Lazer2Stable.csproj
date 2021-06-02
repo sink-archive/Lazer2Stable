@@ -6,20 +6,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="NHibernate" Version="5.3.8" />
+      <PackageReference Include="Dapper" Version="2.0.90" />
+      <PackageReference Include="SQLinq.Dapper" Version="1.2.0" />
       <PackageReference Include="System.Data.SQLite" Version="1.0.113.7" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Include="Mappings\BeatmapMetadata.hbm.xml" />
-      <EmbeddedResource Include="Mappings\BeatmapSetFileInfo.hbm.xml" />
-      <EmbeddedResource Include="Mappings\BeatmapSetInfo.hbm.xml" />
-      <EmbeddedResource Include="Mappings\FileInfo.hbm.xml" />
-      <EmbeddedResource Include="Mappings\ScoreFileInfo.hbm.xml" />
-      <EmbeddedResource Include="Mappings\SkinFileInfo.hbm.xml" />
-      <EmbeddedResource Include="Mappings\SkinInfo.hbm.xml" />
-      <None Remove="Mappings\Beatmapinfo.hbm.xml" />
-      <EmbeddedResource Include="Mappings\BeatmapInfo.hbm.xml" />
     </ItemGroup>
 
 </Project>

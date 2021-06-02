@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Lazer2Stable.Domain;
+using Lazer2Stable.Classes;
+using File = System.IO.File;
 
 namespace Lazer2Stable
 {
@@ -21,9 +22,8 @@ namespace Lazer2Stable
 				dbReader.Scores,
 				dbReader.Skins
 				);
-			dbReader.Dispose();
-			
-			PrintCounts(maps, scores, skins, out var setCount);
+
+			PrintCounts(maps, scores, skins);
 
 			var exportPath     = GetAndPrepareExportPath();
 			var lazerFilesPath = LazerFolderUtils.GetLazerFiles();
@@ -32,7 +32,7 @@ namespace Lazer2Stable
 
 			Console.CursorVisible = false; // makes spinner look nicer
 			
-			PrintProgressInfo($"Exporting {setCount} beatmap sets - this WILL take a while... ");
+			PrintProgressInfo($"Exporting {maps.Keys.Count} mapsets - this WILL take a while... ");
 			exporter.ExportMaps(Path.Combine(exportPath, "Songs"));
 			
 			PrintSuccess();
@@ -95,12 +95,11 @@ namespace Lazer2Stable
 			return dirPath;
 		}
 
-		private static void PrintCounts(Dictionary<BeatmapSetInfo, BeatmapSetFileInfo[]> maps,
-										ScoreFileInfo[] scores,
-										Dictionary<SkinInfo, SkinFileInfo[]> skins,
-										out int setCount)
+		private static void PrintCounts(Dictionary<Mapset, MapsetFile[]> maps,
+										ScoreFile[]                      scores,
+										Dictionary<Skin, SkinFile[]>     skins)
 		{
-			setCount = maps.Keys.Count;
+			var setCount = maps.Keys.Count;
 			var setFileCount = maps.Select(pair => pair.Value.Length)
 									   .Aggregate(0, (current, next) => current + next);
 			var scoreCount  = scores.Length;
