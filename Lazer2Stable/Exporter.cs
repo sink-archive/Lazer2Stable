@@ -13,17 +13,15 @@ namespace Lazer2Stable
 		public readonly string                                           LazerFilesPath;
 		public          Dictionary<BeatmapSetInfo, BeatmapSetFileInfo[]> Maps;
 		public          Dictionary<SkinInfo, SkinFileInfo[]>             Skins;
-		public          ScoreFileInfo[]                                  Replays;
 
 		private readonly ImmutableDictionary<string, FileInfo> _sourceFiles;
 
 		public Exporter(string     lazerFilesPath, Dictionary<BeatmapSetInfo, BeatmapSetFileInfo[]> maps,
-						Dictionary<SkinInfo, SkinFileInfo[]> skins, ScoreFileInfo[] replays)
+						Dictionary<SkinInfo, SkinFileInfo[]> skins)
 		{
 			LazerFilesPath = lazerFilesPath;
 			Maps           = maps;
 			Skins          = skins;
-			Replays   = replays;
 
 			_sourceFiles = new DirectoryInfo(lazerFilesPath)           // lazer files dir
 						  .GetDirectories()                            // all dirs (a, b, c, etc)
@@ -37,7 +35,7 @@ namespace Lazer2Stable
 			Spinner.RunSpinner();
 			foreach (var (set, files) in Maps)
 			{
-				var folderName = $"{set.OnlineBeatmapSetID} {set.Metadata.Artist} - {set.Metadata.Title}";
+				var folderName = $"{set.OnlineBeatmapSetID} {set.Metadata.Artist} - {set.Metadata.Title}".Replace("/", "_");
 				Directory.CreateDirectory(Path.Combine(outputPath, folderName));
 				
 				foreach (var file in files) CopyFile(outputPath, file, folderName, file.FileInfo.ID);
@@ -54,18 +52,6 @@ namespace Lazer2Stable
 				Directory.CreateDirectory(Path.Combine(outputPath, folderName));
 
 				foreach (var file in files) CopyFile(outputPath, file, folderName, file.FileInfo.ID);
-			}
-			Spinner.StopAllSpinners();
-		}
-		
-		public void ExportReplays(string outputPath)
-		{
-			Spinner.RunSpinner();
-			foreach (var replay in Replays)
-			{
-				Directory.CreateDirectory(outputPath);
-
-				CopyFile(outputPath, replay, string.Empty, replay.ID);
 			}
 			Spinner.StopAllSpinners();
 		}
@@ -92,6 +78,7 @@ namespace Lazer2Stable
 				BeatmapSetFileInfo bf => bf.Filename,
 				ScoreFileInfo r       => r.Filename
 			};
+			if (string.IsNullOrWhiteSpace(fileName) || fileName.EndsWith('/')) return;
 			var destPath = Path.Combine(outputPath, folderName, /*file.Filename*/ fileName);
 			// create directory to stop folders in skins causing epic fails
 			Directory.CreateDirectory(new FileInfo(destPath).DirectoryName ?? string.Empty);
@@ -100,7 +87,7 @@ namespace Lazer2Stable
 			File.Copy(sourcePath, destPath);
 		}
 
-		private void CheckAndFixConflicts(ref string destPath, int id)
+		private static void CheckAndFixConflicts(ref string destPath, int id)
 		{
 			if (File.Exists(destPath))
 				destPath += $"_{id}";

@@ -15,7 +15,6 @@
       <EmbeddedResource Include="Mappings\BeatmapSetFileInfo.hbm.xml" />
       <EmbeddedResource Include="Mappings\BeatmapSetInfo.hbm.xml" />
       <EmbeddedResource Include="Mappings\FileInfo.hbm.xml" />
-      <EmbeddedResource Include="Mappings\ScoreFileInfo.hbm.xml" />
       <EmbeddedResource Include="Mappings\SkinFileInfo.hbm.xml" />
       <EmbeddedResource Include="Mappings\SkinInfo.hbm.xml" />
       <None Remove="Mappings\Beatmapinfo.hbm.xml" />
